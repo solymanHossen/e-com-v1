@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
+import logger from "../utils/logger";
 
 const productSchema = Joi.object({
     name: Joi.string().required(),
@@ -7,17 +8,33 @@ const productSchema = Joi.object({
     htmlDescription: Joi.string().required(),
     price: Joi.number().positive().required(),
     category: Joi.array().items(Joi.string()).required(),
-    imageUrl: Joi.string().uri().required(),
+    imageUrl: Joi.string().uri().required()
 });
 
-export const validateCreateProduct = (req: Request, res: Response, next: NextFunction) => {
+// Update Product Schema (allows partial data)
+const updateProductSchema = Joi.object({
+    name: Joi.string(),
+    description: Joi.string(),
+    htmlDescription: Joi.string(),
+    price: Joi.number().positive(),
+    category: Joi.array().items(Joi.string()),
+    imageUrl: Joi.string().uri()
+});
+
+export const validateCreateProduct = (req: Request, res: Response, next: NextFunction):void => {
     const { error } = productSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
+    if (error)  {
+        logger.error(error);
+        res.status(400).json({ error: error.details[0].message }); return;
+    }
     next();
 };
 
-export const validateUpdateProduct = (req: Request, res: Response, next: NextFunction) => {
-    const { error } = productSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
+export const validateUpdateProduct = (req: Request, res: Response, next: NextFunction):void => {
+    const { error } = updateProductSchema.validate(req.body);
+    if (error) {
+        logger.error(error)
+        res.status(400).json({ error: error.details[0].message }); return;
+    }
     next();
 };

@@ -6,8 +6,24 @@ export class ProductService {
         return product.save();
     }
 
-    static async getProducts(query: any = {}): Promise<IProduct[]> {
-        return Product.find(query);
+    static async getProducts(query: any = {}): Promise<{ products: IProduct[], pagination: any }> {
+        const page = parseInt(query.page) || 1;
+        const limit = parseInt(query.limit) || 10;
+        const search = query.search || '';
+        const filterQuery = search ? { name: { $regex: search, $options: 'i' } } : {};
+        const skip = (page - 1) * limit;
+        const [products, total] = await Promise.all([
+            Product.find(filterQuery).skip(skip).limit(limit),
+            Product.countDocuments(filterQuery)
+        ]);
+        const pagination = {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        };
+
+        return { products, pagination };
     }
 
     static async getProductById(id: string): Promise<IProduct | null> {
