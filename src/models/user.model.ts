@@ -15,6 +15,7 @@ export interface IUser extends Document {
         zipCode: string;
         country: string;
     };
+    _id: string;
     phoneNumber?: string;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }

@@ -6,10 +6,12 @@ import compression from 'compression';
 import { config } from 'dotenv';
 import { connectDatabase } from './config/database';
 import authRoutes from './routes/auth.routes';
+import winston from 'winston';
 import userRoutes from './routes/user.routes';
 import productRoutes from './routes/product.routes';
 import orderRoutes from './routes/order.routes';
 import { errorHandler } from './middleware/error.middleware';
+import logger from "./utils/logger";
 
 config(); // Load environment variables
 
@@ -26,10 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 connectDatabase();
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+// app.use('/api/products', productRoutes);
+// app.use('/api/orders', orderRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
@@ -37,7 +39,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
 });
 
 export default app;
