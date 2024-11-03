@@ -8,7 +8,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-    user:Schema.Types.ObjectId;
+    user:IUser['obId'];
     items: IOrderItem[];
     totalAmount: number;
     status: 'pending' | 'processing' | 'shipped' | 'delivered';

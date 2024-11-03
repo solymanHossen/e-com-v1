@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import {IReview} from "./review.model";
 
 export interface IProduct extends Document {
     name: string;
@@ -7,6 +8,9 @@ export interface IProduct extends Document {
     price: number;
     category: string[];
     imageUrl: string;
+    reviews: IReview['_id'][];
+    averageRating: number;
+    reviewCount: number;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -16,6 +20,9 @@ const productSchema = new Schema<IProduct>({
     price: { type: Number, required: true },
     category: [{ type: String, required: true }],
     imageUrl: { type: String, required: true },
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
 }, { timestamps: true });
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);

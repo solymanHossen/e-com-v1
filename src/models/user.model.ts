@@ -16,6 +16,7 @@ export interface IUser extends Document {
         country: string;
     };
     _id: string;
+    obId:Schema.Types.ObjectId | string;
     phoneNumber?: string;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }

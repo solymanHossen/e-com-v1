@@ -12,6 +12,7 @@ import productRoutes from './routes/product.routes';
 import orderRoutes from './routes/order.routes';
 import { errorHandler } from './middleware/error.middleware';
 import logger from "./utils/logger";
+import reviewRoutes from "./routes/review.routes";
 
 config(); // Load environment variables
 
@@ -32,6 +33,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

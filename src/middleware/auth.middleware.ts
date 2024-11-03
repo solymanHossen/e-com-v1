@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User, IUser } from '../models/user.model';
+import logger from "../utils/logger";
 
 export interface AuthRequest extends Request {
     user?: IUser;
@@ -16,7 +17,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { _id: string };
         const user = await User.findOne({ _id: decoded._id });
-
+       logger.info(user);
         if (!user) {
             throw new Error();
         }
