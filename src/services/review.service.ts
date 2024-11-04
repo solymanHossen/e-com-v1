@@ -1,6 +1,6 @@
-import { Review, IReview } from '../models/review.model';
-import { Product } from '../models/product.model';
-import mongoose,{Types} from 'mongoose';
+import {IReview, Review} from '../models/review.model';
+import {Product} from '../models/product.model';
+import mongoose from 'mongoose';
 import logger from "../utils/logger";
 
 export class ReviewService {
@@ -34,7 +34,9 @@ export class ReviewService {
     static async getReviewsByProduct(productId: string): Promise<IReview[]> {
         return Review.find({ product: productId }).populate('user', 'name');
     }
-
+    static async getReviewsByReview(reviewId: string): Promise<IReview[] | null> {
+        return Review.find({_id: reviewId}).populate('user', 'name');
+    }
     static async updateReview(reviewId: string, updateData: Partial<IReview>): Promise<IReview | null> {
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -71,6 +73,7 @@ export class ReviewService {
         session.startTransaction();
 
         try {
+
             const review = await Review.findByIdAndDelete(reviewId).session(session);
             if (!review) {
                 throw new Error('Review not found');
@@ -102,4 +105,5 @@ export class ReviewService {
             session.endSession();
         }
     }
+
 }
