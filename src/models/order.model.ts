@@ -9,7 +9,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-    user:IUser['obId'];
+    user:IUser['_id'] | undefined;
     items: IOrderItem[];
     totalAmount: number;
     discountAmount: number;

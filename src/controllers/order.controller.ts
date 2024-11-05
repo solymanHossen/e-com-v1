@@ -2,8 +2,8 @@ import { Response } from 'express';
 import { OrderService } from '../services/order.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import logger from "../utils/logger";
-
 export const createOrder = async (req: AuthRequest, res: Response):Promise<void> => {
+
     try {
         const orderData = {
             user: req.user!._id,
@@ -17,7 +17,7 @@ export const createOrder = async (req: AuthRequest, res: Response):Promise<void>
     }
 };
 
-export const getOrders = async (req: AuthRequest, res: Response) => {
+export const getOrders = async (req: AuthRequest , res: Response) => {
     try {
         const orders = await OrderService.getOrders(req.user!._id);
         res.json(orders);
@@ -33,7 +33,7 @@ export const getOrder = async (req: AuthRequest, res: Response):Promise<void> =>
         if (!order) {
              res.status(404).json({ message: 'Order not found' }); return ;
         }
-        if (order.user.toString() !== req.user!._id.toString()) {
+        if (!order.user || order.user.toString()  !== req.user!._id.toString()) {
              res.status(403).json({ message: 'Not authorized to view this order' }); return
         }
         res.json(order);

@@ -1,4 +1,5 @@
 import { Order, IOrder } from '../models/order.model';
+import {Schema} from "mongoose";
 
 export class OrderService {
     static async createOrder(orderData: Partial<IOrder>): Promise<IOrder> {
@@ -6,7 +7,7 @@ export class OrderService {
         return order.save();
     }
 
-    static async getOrders(userId: string): Promise<IOrder[]> {
+    static async getOrders(userId:string | Schema.Types.ObjectId): Promise<IOrder[]> {
         return Order.find({ user: userId }).populate('items.product');
     }
 
