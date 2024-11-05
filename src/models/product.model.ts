@@ -11,6 +11,7 @@ export interface IProduct extends Document {
     reviews: IReview['_id'][];
     averageRating: number;
     reviewCount: number;
+    stock:number;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -23,6 +24,7 @@ const productSchema = new Schema<IProduct>({
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
     averageRating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },
+    stock:{ type: Number,required: true },
 }, { timestamps: true });
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);

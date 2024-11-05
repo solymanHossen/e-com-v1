@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import {ICart} from "./cart.model";
 
 export interface IUser extends Document {
     email: string;
@@ -15,9 +16,10 @@ export interface IUser extends Document {
         zipCode: string;
         country: string;
     };
-    _id: string;
+    _id:Schema.Types.ObjectId | string ;
     obId:Schema.Types.ObjectId | string;
     phoneNumber?: string;
+    cart: ICart['_id'];
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -36,6 +38,7 @@ const userSchema = new Schema<IUser>({
         country: { type: String },
     },
     phoneNumber: { type: String },
+    cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
 }, { timestamps: true });
 
 userSchema.pre<IUser>('save', async function (next) {

@@ -8,7 +8,8 @@ const productSchema = Joi.object({
     htmlDescription: Joi.string().required(),
     price: Joi.number().positive().required(),
     category: Joi.array().items(Joi.string()).required(),
-    imageUrl: Joi.string().uri().required()
+    imageUrl: Joi.string().uri().required(),
+    stock: Joi.number().positive().required(),
 });
 
 // Update Product Schema (allows partial data)
@@ -18,7 +19,8 @@ const updateProductSchema = Joi.object({
     htmlDescription: Joi.string(),
     price: Joi.number().positive(),
     category: Joi.array().items(Joi.string()),
-    imageUrl: Joi.string().uri()
+    imageUrl: Joi.string().uri(),
+    stock: Joi.number().positive()
 });
 
 export const validateCreateProduct = (req: Request, res: Response, next: NextFunction):void => {

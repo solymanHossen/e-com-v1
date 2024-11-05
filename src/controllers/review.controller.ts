@@ -43,20 +43,20 @@ export const updateReview = async (req: AuthRequest, res: Response):Promise<void
 };
 
 export const deleteReview = async (req: AuthRequest, res: Response):Promise<void> => {
-    try {
-        const review = await ReviewService.getReviewsByProduct(req.params.reviewId);
-        // console.log(review,req.params.reviewId,'check this');
-        if (!review) {
-             res.status(404).json({ error: 'Review not found' }); return ;
+    const reviewId  = req.params.reviewId;
+        try {
+            const review = await ReviewService.getReviewsByReview(reviewId);
+            if (!review) {
+                 res.status(404).json({ error: 'Review not found' }); return
+            }
+            if (review[0].user._id.toString() !== req.user?._id.toString()) {
+                res.status(403).json({ error: 'Not authorized to delete this review' });
+                return;
+            }
+            await ReviewService.deleteReview(reviewId);
+            res.json({ message: 'Review deleted successfully' });
+        } catch (error:any) {
+            logger.error(`Error deleting review with ID ${reviewId}: ${error.message}`);
+            res.status(400).json({ error: 'Error deleting review' });
         }
-        console.log(review[0].user,'this si the first user')
-        if (review[0].user.toString() !== req.user!._id.toString()) {
-            res.status(403).json({ error: 'Not authorized to delete this review' }); return ;
-        }
-        await ReviewService.deleteReview(req.params.reviewId);
-        res.json({ message: 'Review deleted successfully' });
-    } catch (error) {
-        logger.error(error);
-        res.status(400).json({ error: 'Error deleting review' });
-    }
-};
+}
