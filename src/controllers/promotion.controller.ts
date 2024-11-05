@@ -52,6 +52,7 @@ export const getPromotionEffectiveness = async (req: Request, res: Response) => 
         const effectiveness = await PromotionService.getPromotionEffectiveness(req.params.id);
         res.json(effectiveness);
     } catch (error) {
+        logger.error("Error for promotion effectiveness",error)
         res.status(400).json({ error: 'Error fetching promotion effectiveness' });
     }
 };

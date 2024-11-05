@@ -6,8 +6,8 @@ import { validateCreateDiscount, validateUpdateDiscount } from '../validators/di
 const router = express.Router();
 
 router.post('/', authMiddleware, validateCreateDiscount, createDiscount);
-// router.get('/', getDiscounts);
-// router.put('/:id', authMiddleware, validateUpdateDiscount, updateDiscount);
-// router.delete('/:id', authMiddleware, deleteDiscount);
+router.get('/', getDiscounts);
+router.put('/:id', authMiddleware, validateUpdateDiscount, updateDiscount);
+router.delete('/:id', authMiddleware, deleteDiscount);
 
 export default router;
