@@ -1,14 +1,15 @@
-import { Cart, ICart } from '../models/cart.model';
-import { CartItem, ICartItem } from '../models/cart-item.model';
-import { Product } from '../models/product.model';
-import { User } from '../models/user.model';
+import {Cart, ICart} from '../models/cart.model';
+import {CartItem, ICartItem} from '../models/cart-item.model';
+import {IProduct, Product} from '../models/product.model';
+import {User} from '../models/user.model';
 import mongoose, {Schema} from 'mongoose';
+import logger from "../utils/logger";
 
 export class CartService {
     static async getCart(userId: string | Schema.Types.ObjectId): Promise<ICart | null> {
-        return Cart.findOne({ user: userId }).populate({
+        return Cart.findOne({user: userId}).populate({
             path: 'items',
-            populate: { path: 'product' }
+            populate: {path: 'product'}
         });
     }
 
@@ -17,11 +18,11 @@ export class CartService {
         session.startTransaction();
 
         try {
-            let cart = await Cart.findOne({ user: userId }).session(session);
+            let cart = await Cart.findOne({user: userId}).session(session);
             if (!cart) {
-                cart = new Cart({ user: userId, items: [], totalAmount: 0 });
-                await cart.save({ session });
-                await User.findByIdAndUpdate(userId, { cart: cart._id }, { session });
+                cart = new Cart({user: userId, items: [], totalAmount: 0});
+                await cart.save({session});
+                await User.findByIdAndUpdate(userId, {cart: cart._id}, {session});
             }
 
             const product = await Product.findById(productId).session(session);
@@ -29,27 +30,27 @@ export class CartService {
                 throw new Error('Product not found');
             }
 
-            if (product.stock < quantity) {
+            if ((product.stock ?? 0) < quantity) {
                 throw new Error('Not enough stock');
             }
 
-            let cartItem= await CartItem.findOne({ cart: cart._id, product: productId }).session(session);
+            let cartItem = await CartItem.findOne({cart: cart._id, product: productId}).session(session);
             if (cartItem) {
                 cartItem.quantity += quantity;
                 cartItem.price = product.price * cartItem.quantity;
-                await cartItem.save({ session });
+                await cartItem.save({session});
             } else {
                 cartItem = new CartItem({
                     product: productId,
                     quantity,
                     price: product.price * quantity
                 });
-                await cartItem.save({ session });
+                await cartItem.save({session});
                 cart.items.push(cartItem._id as mongoose.Types.ObjectId);
             }
 
             cart.totalAmount = await this.calculateCartTotal(cart._id, session);
-            await cart.save({ session });
+            await cart.save({session});
 
             await session.commitTransaction();
             return cart;
@@ -61,12 +62,12 @@ export class CartService {
         }
     }
 
-   /* static async removeFromCart(userId: string, cartItemId: string): Promise<ICart> {
+    static async removeFromCart(userId: string | Schema.Types.ObjectId, cartItemId: string): Promise<ICart> {
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const cart = await Cart.findOne({ user: userId }).session(session);
+            const cart = await Cart.findOne({user: userId}).session(session);
             if (!cart) {
                 throw new Error('Cart not found');
             }
@@ -75,80 +76,85 @@ export class CartService {
             await CartItem.findByIdAndDelete(cartItemId).session(session);
 
             cart.totalAmount = await this.calculateCartTotal(cart._id, session);
-            await cart.save({ session });
+            await cart.save({session});
 
             await session.commitTransaction();
             return cart;
         } catch (error) {
             await session.abortTransaction();
-            throw error;
+            throw error
         } finally {
             session.endSession();
         }
-    }*/
+    }
 
-    /*static async updateCartItemQuantity(userId: string, cartItemId: string, quantity: number): Promise<ICart> {
+    static async updateCartItemQuantity(userId: string | Schema.Types.ObjectId, cartItemId: string, quantity: number): Promise<ICart> {
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const cart = await Cart.findOne({ user: userId }).session(session);
+            const cart = await Cart.findOne({user: userId}).session(session);
             if (!cart) {
                 throw new Error('Cart not found');
             }
 
             const cartItem = await CartItem.findById(cartItemId).populate('product').session(session);
+
             if (!cartItem) {
                 throw new Error('Cart item not found');
             }
+            const product = cartItem.product as IProduct;
 
-            if (cartItem.product.stock < quantity) {
-                throw new Error('Not enough stock');
+            if (cartItem) {
+                if ((product.stock ?? 0) < quantity) {
+                    throw new Error('Not enough stock');
+                }
             }
 
             cartItem.quantity = quantity;
-            cartItem.price = cartItem.product.price * quantity;
-            await cartItem.save({ session });
+            cartItem.price = product.price * quantity;
+            await cartItem.save({session});
 
             cart.totalAmount = await this.calculateCartTotal(cart._id, session);
-            await cart.save({ session });
+            await cart.save({session});
 
             await session.commitTransaction();
             return cart;
         } catch (error) {
+            logger.error(error);
             await session.abortTransaction();
             throw error;
         } finally {
             session.endSession();
         }
-    }*/
+    }
 
-  /*  static async clearCart(userId: string): Promise<void> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
+      static async clearCart(userId: string | Schema.Types.ObjectId): Promise<void> {
+          const session = await mongoose.startSession();
+          session.startTransaction();
 
-        try {
-            const cart = await Cart.findOne({ user: userId }).session(session);
-            if (!cart) {
-                throw new Error('Cart not found');
-            }
+          try {
+              const cart = await Cart.findOne({ user: userId }).session(session);
+              if (!cart) {
+                  throw new Error('Cart not found');
+              }
 
-            await CartItem.deleteMany({ _id: { $in: cart.items } }).session(session);
-            cart.items = [];
-            cart.totalAmount = 0;
-            await cart.save({ session });
+              await CartItem.deleteMany({ _id: { $in: cart.items } }).session(session);
+              cart.items = [];
+              cart.totalAmount = 0;
+              await cart.save({ session });
 
-            await session.commitTransaction();
-        } catch (error) {
-            await session.abortTransaction();
-            throw error;
-        } finally {
-            session.endSession();
-        }
-    }*/
+              await session.commitTransaction();
+          } catch (error) {
+              await session.abortTransaction();
+              throw error;
+          } finally {
+              session.endSession();
+          }
+      }
 
     private static async calculateCartTotal(cartId: string | Schema.Types.ObjectId, session: mongoose.ClientSession): Promise<number> {
-        const cartItems = await CartItem.find({ _id: { $in: (await Cart.findById(cartId).session(session))?.items } }).session(session);
+        const cartItems = await CartItem.find({_id: {$in: (await Cart.findById(cartId).session(session))?.items}}).session(session);
         return cartItems.reduce((total, item) => total + item.price, 0);
     }
 }

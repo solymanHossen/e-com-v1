@@ -11,7 +11,7 @@ export interface IProduct extends Document {
     reviews: IReview['_id'][];
     averageRating: number;
     reviewCount: number;
-    stock:number;
+    stock:number | null;
 }
 
 const productSchema = new Schema<IProduct>({

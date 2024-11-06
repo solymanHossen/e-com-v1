@@ -23,6 +23,7 @@ export const validateAddToCart = (req: Request, res: Response, next: NextFunctio
 export const validateUpdateCartItem = (req: Request, res: Response, next: NextFunction):void => {
     const { error } = updateCartItemSchema.validate(req.body);
     if (error) {
+        logger.error(error);
          res.status(400).json({ error: error.details[0].message }); return ;
     }
     next();
