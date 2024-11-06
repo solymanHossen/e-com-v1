@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import {ICart} from "./cart.model";
+import {IWishlist} from "./wishlist.model";
 
 export interface IUser extends Document {
     email: string;
@@ -20,6 +21,7 @@ export interface IUser extends Document {
     obId:Schema.Types.ObjectId | string;
     phoneNumber?: string;
     cart: ICart['_id'];
+    wishlist: IWishlist['_id'];
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -39,6 +41,7 @@ const userSchema = new Schema<IUser>({
     },
     phoneNumber: { type: String },
     cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
+    wishlist: { type: Schema.Types.ObjectId, ref: 'Wishlist' },
 }, { timestamps: true });
 
 userSchema.pre<IUser>('save', async function (next) {

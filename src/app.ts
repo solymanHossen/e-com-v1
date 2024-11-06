@@ -16,6 +16,7 @@ import reviewRoutes from "./routes/review.routes";
 import promotionRoutes from "./routes/promotion.routes";
 import discountRoutes from "./routes/discount.routes";
 import cartRoutes from "./routes/cart.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
 
 config(); // Load environment variables
 
@@ -40,6 +41,7 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/promotions', promotionRoutes);
 app.use('/api/v1/discounts', discountRoutes);
 app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
