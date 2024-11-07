@@ -35,45 +35,46 @@ export const removeFromWishlist = async (req: AuthRequest, res: Response) => {
     }
 };
 
-/*export const clearWishlist = async (req: AuthRequest, res: Response) => {
+export const clearWishlist = async (req: AuthRequest, res: Response):Promise<void> => {
     try {
         await WishlistService.clearWishlist(req.user!._id);
         res.json({ message: 'Wishlist cleared successfully' });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        logger.error(error)
+        res.status(400).json( error);
     }
-};*/
+};
 
-/*
 export const generateShareableLink = async (req: AuthRequest, res: Response) => {
     try {
         const shareableLink = await WishlistService.generateShareableLink(req.user!._id);
         res.json({ shareableLink });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        logger.error(error);
+        res.status(400).json(error);
     }
 };
-*/
 
-/*export const getSharedWishlist = async (req: Request, res: Response) => {
+export const getSharedWishlist = async (req: Request, res: Response):Promise<void> => {
     try {
         const { shareableLink } = req.params;
         const wishlist = await WishlistService.getWishlistByShareableLink(shareableLink);
         if (!wishlist) {
-            return res.status(404).json({ error: 'Shared wishlist not found' });
+             res.status(404).json({ error: 'Shared wishlist not found' }); return ;
         }
         res.json(wishlist);
     } catch (error) {
+        logger.error(error);
         res.status(400).json({ error: 'Error fetching shared wishlist' });
     }
-};*/
+};
 
-/*
 export const checkForDiscounts = async (req: AuthRequest, res: Response) => {
     try {
         const discountedItems = await WishlistService.checkForDiscounts(req.user!._id);
         res.json(discountedItems);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        logger.error(error);
+        res.status(400).json( error);
     }
-};*/
+};

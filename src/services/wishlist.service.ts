@@ -53,17 +53,18 @@ export class WishlistService {
         return wishlist;
     }
 
-/*    static async clearWishlist(userId: string): Promise<void> {
+    static async clearWishlist(userId: string | Schema.Types.ObjectId): Promise<void> {
         const wishlist = await Wishlist.findOne({ user: userId });
+        console.log(wishlist,'this is wishlist')
         if (!wishlist) {
             throw new Error('Wishlist not found');
         }
 
         wishlist.products = [];
         await wishlist.save();
-    }*/
+    }
 
- /*   static async generateShareableLink(userId: string): Promise<string> {
+    static async generateShareableLink(userId: string | Schema.Types.ObjectId): Promise<string> {
         const wishlist = await Wishlist.findOne({ user: userId });
         if (!wishlist) {
             throw new Error('Wishlist not found');
@@ -75,13 +76,13 @@ export class WishlistService {
         }
 
         return wishlist.shareableLink;
-    }*/
+    }
 
- /*   static async getWishlistByShareableLink(shareableLink: string): Promise<IWishlist | null> {
+    static async getWishlistByShareableLink(shareableLink: string): Promise<IWishlist | null> {
         return Wishlist.findOne({ shareableLink }).populate('products');
-    }*/
+    }
 
-/*    static async checkForDiscounts(userId: string): Promise<{ productId: string; discount: number }[]> {
+    static async checkForDiscounts(userId: string | Schema.Types.ObjectId): Promise<{ productId: string; discount: number }[]> {
         const wishlist = await Wishlist.findOne({ user: userId }).populate('products');
         if (!wishlist) {
             throw new Error('Wishlist not found');
@@ -95,5 +96,5 @@ export class WishlistService {
         }).filter(item => item !== null);
 
         return discountedItems;
-    }*/
+    }
 }

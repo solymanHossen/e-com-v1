@@ -13,6 +13,7 @@ const orderSchema = Joi.object({
     totalPrice: Joi.number().positive(),
     totalAmount: Joi.number().positive(),
     status: Joi.string().valid(),
+    finalAmount: Joi.number().positive(),
 });
 
 const orderStatusSchema = Joi.object({
