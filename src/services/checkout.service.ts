@@ -50,8 +50,8 @@ export class CheckoutService {
 
         await order.save();
 
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+        const session:Stripe.Response<Stripe.Checkout.Session> = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'] as any,
             line_items: cartItems.map((item: ICartItem ) => ({
                 price_data: {
                     currency: 'usd',
