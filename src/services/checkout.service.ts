@@ -6,7 +6,11 @@ import { PromotionService } from './promotion.service';
 import Stripe from 'stripe';
 import {Schema} from "mongoose";
 import {ICartItem} from "../models/cart-item.model";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+import dotenv from 'dotenv';
+dotenv.config();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    apiVersion: '2024-10-28.acacia',
 });
 
 const TAX_RATE = 0.1; // 10% tax rate
@@ -50,27 +54,29 @@ export class CheckoutService {
 
         await order.save();
 
-        const session:Stripe.Response<Stripe.Checkout.Session> = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'] as any,
-            line_items: cartItems.map((item: ICartItem ) => ({
+        const sessionParams: Stripe.Checkout.SessionCreateParams = {
+            payment_method_types: ['card'],
+            line_items: cartItems.map((item: ICartItem) => ({
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: (item.product as IProduct).name, // Type assertion
-                        images: [(item.product as IProduct).imageUrl], // Type assertion
+                        name: (item.product as IProduct).name,
+                        images: [(item.product as IProduct).imageUrl],
                     },
-                    unit_amount: Math.round(item.price * 100), // Stripe expects amounts in cents
+                    unit_amount: Math.round(item.price * 100),
                 },
                 quantity: item.quantity,
             })),
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
-            customer_email: (await User.findById(userId))?.email?? "",
+            customer_email: (await User.findById(userId))?.email ?? "",
             metadata: {
-                orderId: order?.id.toString() as IOrder['_id']
+                orderId: order?.id.toString() as IOrder['_id'] as string,
             },
-        });
+        };
+
+        const session = await stripe.checkout.sessions.create(sessionParams);
 
         return { sessionId: session.id, orderId: order?.id.toString() };
     }
