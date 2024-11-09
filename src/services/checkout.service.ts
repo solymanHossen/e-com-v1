@@ -7,6 +7,7 @@ import Stripe from 'stripe';
 import {Schema} from "mongoose";
 import {ICartItem} from "../models/cart-item.model";
 import dotenv from 'dotenv';
+import {OrderService} from "./order.service";
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -19,6 +20,7 @@ const SHIPPING_COST = 10; // $10 flat shipping rate
 export class CheckoutService {
     static async createCheckoutSession(userId: string | Schema.Types.ObjectId, shippingAddress: IOrder['shippingAddress'], billingAddress: IOrder['billingAddress'], promotionCode?: string): Promise<{ sessionId: string; orderId: string }> {
         const cart = await Cart.findOne({ user: userId }).populate('items.product');
+
         if (!cart || cart.items.length === 0) {
             throw new Error('Cart is empty');
         }
@@ -37,22 +39,23 @@ export class CheckoutService {
         }
 
         const finalAmount = total - discountAmount;
+        const orders = await OrderService.getOrderById('672c5087c9e0200ce7d77e0a');
+        console.log('orders',orders);
+        // const order = new Order({
+        //     user: userId,
+        //     items: cart.items,
+        //     totalAmount: total,
+        //     subtotal,
+        //     tax,
+        //     shippingCost: SHIPPING_COST,
+        //     discountAmount,
+        //     finalAmount,
+        //     shippingAddress,
+        //     billingAddress,
+        //     paymentMethod: 'credit_card', // Default to credit card, can be changed later
+        // });
 
-        const order = new Order({
-            user: userId,
-            items: cart.items,
-            totalAmount: total,
-            subtotal,
-            tax,
-            shippingCost: SHIPPING_COST,
-            discountAmount,
-            finalAmount,
-            shippingAddress,
-            billingAddress,
-            paymentMethod: 'credit_card', // Default to credit card, can be changed later
-        });
-
-        await order.save();
+        // await order.save();
 
         const sessionParams: Stripe.Checkout.SessionCreateParams = {
             payment_method_types: ['card'],
@@ -60,28 +63,30 @@ export class CheckoutService {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: (item.product as IProduct).name,
-                        images: [(item.product as IProduct).imageUrl],
+                        // name: (item.product as IProduct).name,
+                        // images: [(item.product as IProduct).imageUrl],
+                        name:"solyman",
+
                     },
-                    unit_amount: Math.round(item.price * 100),
+                    unit_amount: 200,
                 },
-                quantity: item.quantity,
+                quantity: 200,
             })),
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
             customer_email: (await User.findById(userId))?.email ?? "",
             metadata: {
-                orderId: order?.id.toString() as IOrder['_id'] as string,
+                orderId: orders?.id.toString() as IOrder['_id'] as string,
             },
         };
 
         const session = await stripe.checkout.sessions.create(sessionParams);
 
-        return { sessionId: session.id, orderId: order?.id.toString() };
+        return { sessionId: session.id, orderId: orders?.id.toString() };
     }
 
-/*    static async confirmOrder(sessionId: string): Promise<IOrder> {
+    static async confirmOrder(sessionId: string): Promise<IOrder> {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
         const orderId = session.metadata?.orderId;
 
@@ -118,5 +123,5 @@ export class CheckoutService {
             throw new Error('Order not found');
         }
         return order;
-    }*/
+    }
 }
