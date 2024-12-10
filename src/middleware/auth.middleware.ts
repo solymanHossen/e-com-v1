@@ -10,13 +10,12 @@ export interface AuthRequest extends Request {
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
-
         if (!token) {
             throw new Error();
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { _id: string };
-        const user = await User.findOne({ _id: decoded._id });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {id: string };
+        const user = await User.findOne({ _id: decoded.id });
        logger.info(user);
         if (!user) {
             throw new Error();

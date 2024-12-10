@@ -1,31 +1,40 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model';
+import { AuthService } from '../services/auth.service';
+import logger from "../utils/logger";
 
-export const register = async (req: Request, res: Response):Promise<void> => {
+export const register = async (req: Request, res: Response) => {
     try {
-        const { email, password, name } = req.body;
-        const user = new User({ email, password, name });
-        await user.save();
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as string);
-        res.status(201).json({ user, token });
-    } catch (error) {
-        res.status(400).json({ error: 'Registration failed' });
+        const { name, email, password } = req.body;
+        await AuthService.register(name, email, password);
+        res.status(201).json({ message: 'User registered, verification email sent' });
+    } catch (error:any) {
+        logger.error(error);
+        res.status(400).json({ message: error.message });
     }
 };
 
-export const login = async (req: Request, res: Response):Promise<void> => {
+export const verifyEmail = async (req: Request, res: Response) => {
     try {
-        const { email, password } =   req.body;
-        const user = await User.findOne({ email });
+        const { token } = req.params;
+        await AuthService.verifyEmail(token);
+        res.status(200).json({ message: 'Email verified successfully' });
+    } catch (error:any) {
+        logger.error(error);
+        res.status(400).json({ message: error.message });
+    }
+};
 
-        if (!user || !(await user.comparePassword(password))) {
-            res.status(401).json({ error: 'Invalid credentials' }); return;
-        }
-
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET as string);
-        res.json({ user, token });
-    } catch (error) {
-        res.status(400).json({ error: 'Login failed' });
+export const login = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body;
+        const { user, token } = await AuthService.login(email, password);
+        res.status(200).json({
+            message: 'Login successful',
+            userId: user._id,
+            token,
+        });
+    } catch (error:any) {
+        logger.error(error);
+        res.status(400).json({ message: error.message });
     }
 };

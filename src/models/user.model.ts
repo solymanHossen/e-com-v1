@@ -17,6 +17,8 @@ export interface IUser extends Document {
         zipCode: string;
         country: string;
     };
+    isVerified: boolean;
+    verificationToken?: string;
     _id:Schema.Types.ObjectId | string ;
     obId:Schema.Types.ObjectId | string;
     phoneNumber?: string;
@@ -39,6 +41,8 @@ const userSchema = new Schema<IUser>({
         zipCode: { type: String },
         country: { type: String },
     },
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
     phoneNumber: { type: String },
     cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
     wishlist: { type: Schema.Types.ObjectId, ref: 'Wishlist' },

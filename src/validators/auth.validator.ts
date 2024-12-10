@@ -7,6 +7,9 @@ const registerSchema = Joi.object({
     password: Joi.string().min(6).required(),
     name: Joi.string().required(),
 });
+ const verifyEmailSchema = Joi.object({
+     token: Joi.string().required().length(64).hex()
+});
 
 const loginSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -30,3 +33,11 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction):v
     }
     next();
 };
+export const verifyEmailValidator=(req: Request, res: Response, next: NextFunction):void => {
+    const { error } = verifyEmailSchema.validate(req.params);
+    if (error) {
+        logger.error(error);
+        res.status(400).json({ error: error.details[0].message });return;
+    }
+    next()
+}
