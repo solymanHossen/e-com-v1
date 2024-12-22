@@ -10,6 +10,7 @@ const orderSchema = Joi.object({
         })
     ).required(),
     user: Joi.string(),
+    subtotal: Joi.number(),
     totalPrice: Joi.number().positive(),
     totalAmount: Joi.number().positive(),
     status: Joi.string().valid(),

@@ -10,7 +10,9 @@ import dotenv from "dotenv";
 import { OrderService } from "./order.service";
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string,{
+apiVersion: '2024-12-18.acacia'as Stripe.LatestApiVersion,
+});
 
 const TAX_RATE = 0.1; // 10% tax rate
 const SHIPPING_COST = 10; // $10 flat shipping rate
@@ -22,14 +24,21 @@ export class CheckoutService {
     billingAddress: IOrder["billingAddress"],
     promotionCode?: string
   ): Promise<{ sessionId: string; orderId: string }> {
-    const cart = await Cart.findOne({ user: userId }).populate("items.product");
+    const cart = await Cart.findOne({ user: userId })
+        .populate({
+          path: 'items',
+          populate: {
+            path: 'product',
+            model: 'Product',
+          },
+        });
 
     if (!cart || cart.items.length === 0) {
       throw new Error("Cart is empty");
     }
     const cartItems = cart.items as unknown as ICartItem[];
 
-    const subtotal = cartItems.reduce(
+    const subtotal:number = cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
@@ -50,50 +59,49 @@ export class CheckoutService {
     }
 
     const finalAmount = total - discountAmount;
-    const orders = await OrderService.getOrderById("672c5087c9e0200ce7d77e0a");
-    console.log("orders", orders);
-    // const order = new Order({
-    //     user: userId,
-    //     items: cart.items,
-    //     totalAmount: total,
-    //     subtotal,
-    //     tax,
-    //     shippingCost: SHIPPING_COST,
-    //     discountAmount,
-    //     finalAmount,
-    //     shippingAddress,
-    //     billingAddress,
-    //     paymentMethod: 'credit_card', // Default to credit card, can be changed later
-    // });
+    const order = await OrderService.createOrder({
+      user: userId,
+      items: cartItems,
+      totalAmount: total,
+      subtotal,
+      tax,
+      shippingCost: SHIPPING_COST,
+      discountAmount,
+      finalAmount,
+      shippingAddress,
+      billingAddress,
+      paymentMethod: 'credit_card',
+      status: 'pending',
+      paymentStatus: 'pending',
+    });
 
-    // await order.save();
 
+ /*   await order.save();*/
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ["card"],
       line_items: cartItems.map((item: ICartItem) => ({
         price_data: {
           currency: "usd",
           product_data: {
-            // name: (item.product as IProduct).name,
-            // images: [(item.product as IProduct).imageUrl],
-            name: "solyman",
+            name: (item.product as IProduct).name,
+            images: [(item.product as IProduct).imageUrl],
           },
-          unit_amount: 200,
+          unit_amount: Math.round(item.price * 100), // Stripe expects amount in cents
         },
-        quantity: 200,
+        quantity: item.quantity,
       })),
       mode: "payment",
       success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
       customer_email: (await User.findById(userId))?.email ?? "",
       metadata: {
-        orderId: orders?.id.toString() as IOrder["_id"] as string,
+        orderId: order?._id?.toString() as string,
       },
     };
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    return { sessionId: session.id, orderId: orders?.id.toString() };
+    return { sessionId: session.id, orderId: order?._id as string };
   }
 
   static async confirmOrder(sessionId: string): Promise<IOrder> {
@@ -116,17 +124,20 @@ export class CheckoutService {
       await order.save();
 
       // Update product stock
-      for (const item of order.items) {
-        await Product.findByIdAndUpdate(item.product, {
-          $inc: { stock: -item.quantity },
-        });
-      }
+      const updatePromises = order.items.map(item =>
+          Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } })
+      );
+      await Promise.all(updatePromises);
 
       // Clear the user's cart
       await Cart.findOneAndUpdate(
         { user: order.user },
         { $set: { items: [] } }
       );
+    }else {
+      order.paymentStatus = "failed";
+      order.status = "cancelled";
+      await order.save();
     }
 
     return order;

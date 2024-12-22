@@ -30,6 +30,9 @@ export interface IBillingAddress {
 export interface IOrder extends Document {
     user:IUser['_id'] | undefined;
     items: IOrderItem[];
+    subtotal: number;
+    tax: number;
+    shippingCost: number;
     totalAmount: number;
     discountAmount: number;
     finalAmount: number;
@@ -48,6 +51,9 @@ const orderSchema = new Schema<IOrder>({
         product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
         quantity: { type: Number, required: true },
     }],
+    subtotal:{ type: Number, required: true },
+    tax: { type: Number,default:0 },
+    shippingCost: { type: Number, required: true },
     totalAmount: { type: Number, required: true },
     discountAmount: { type: Number, default: 0 },
     finalAmount: { type: Number, required: true },
