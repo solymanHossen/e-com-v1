@@ -14,6 +14,13 @@ const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const product_routes_1 = __importDefault(require("./routes/product.routes"));
 const order_routes_1 = __importDefault(require("./routes/order.routes"));
 const error_middleware_1 = require("./middleware/error.middleware");
+const logger_1 = __importDefault(require("./utils/logger"));
+const review_routes_1 = __importDefault(require("./routes/review.routes"));
+const promotion_routes_1 = __importDefault(require("./routes/promotion.routes"));
+const discount_routes_1 = __importDefault(require("./routes/discount.routes"));
+const cart_routes_1 = __importDefault(require("./routes/cart.routes"));
+const wishlist_routes_1 = __importDefault(require("./routes/wishlist.routes"));
+const checkout_routes_1 = __importDefault(require("./routes/checkout.routes"));
 (0, dotenv_1.config)(); // Load environment variables
 const app = (0, express_1.default)();
 // Middleware
@@ -25,14 +32,20 @@ app.use(express_1.default.urlencoded({ extended: true }));
 // Connect to MongoDB
 (0, database_1.connectDatabase)();
 // Routes
-app.use('/api/auth', auth_routes_1.default);
-app.use('/api/users', user_routes_1.default);
-app.use('/api/products', product_routes_1.default);
-app.use('/api/orders', order_routes_1.default);
+app.use('/api/v1/auth', auth_routes_1.default);
+app.use('/api/v1/users', user_routes_1.default);
+app.use('/api/v1/products', product_routes_1.default);
+app.use('/api/v1/orders', order_routes_1.default);
+app.use('/api/v1/reviews', review_routes_1.default);
+app.use('/api/v1/promotions', promotion_routes_1.default);
+app.use('/api/v1/discounts', discount_routes_1.default);
+app.use('/api/v1/cart', cart_routes_1.default);
+app.use('/api/v1/wishlist', wishlist_routes_1.default);
+app.use('/api/v1/checkout', checkout_routes_1.default);
 // Error handling middleware
 app.use(error_middleware_1.errorHandler);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger_1.default.info(`Server is running on port ${PORT}`);
 });
 exports.default = app;

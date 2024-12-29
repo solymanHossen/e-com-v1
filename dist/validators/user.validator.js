@@ -16,12 +16,15 @@ const updateUserSchema = joi_1.default.object({
         zipCode: joi_1.default.string(),
         country: joi_1.default.string(),
     }),
+    _id: joi_1.default.string(),
     phoneNumber: joi_1.default.string(),
 });
 const validateUpdateUser = (req, res, next) => {
     const { error } = updateUserSchema.validate(req.body);
-    if (error)
-        return res.status(400).json({ error: error.details[0].message });
+    if (error) {
+        res.status(400).json({ error: error.details[0].message });
+        return;
+    }
     next();
 };
 exports.validateUpdateUser = validateUpdateUser;

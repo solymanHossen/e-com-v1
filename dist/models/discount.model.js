@@ -33,18 +33,18 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.Discount = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const productSchema = new mongoose_1.Schema({
+const discountSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    htmlDescription: { type: String, required: true },
-    price: { type: Number, required: true },
-    category: [{ type: String, required: true }],
-    imageUrl: { type: String, required: true },
-    reviews: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Review' }],
-    averageRating: { type: Number, default: 0 },
-    reviewCount: { type: Number, default: 0 },
-    stock: { type: Number, required: true },
+    type: { type: String, enum: ['percentage', 'fixed'], required: true },
+    value: { type: Number, required: true },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    isActive: { type: Boolean, default: true },
+    minPurchaseAmount: { type: Number },
+    applicableProducts: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Product' }],
+    applicableCategories: [{ type: String }],
 }, { timestamps: true });
-exports.Product = mongoose_1.default.model('Product', productSchema);
+exports.Discount = mongoose_1.default.model('Discount', discountSchema);

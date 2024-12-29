@@ -33,18 +33,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.Wishlist = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const productSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    htmlDescription: { type: String, required: true },
-    price: { type: Number, required: true },
-    category: [{ type: String, required: true }],
-    imageUrl: { type: String, required: true },
-    reviews: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Review' }],
-    averageRating: { type: Number, default: 0 },
-    reviewCount: { type: Number, default: 0 },
-    stock: { type: Number, required: true },
+const wishlistSchema = new mongoose_1.Schema({
+    user: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+    products: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Product' }],
+    shareableLink: { type: String, unique: true, sparse: true },
 }, { timestamps: true });
-exports.Product = mongoose_1.default.model('Product', productSchema);
+wishlistSchema.index({ user: 1, 'products': 1 }, { unique: true });
+exports.Wishlist = mongoose_1.default.model('Wishlist', wishlistSchema);

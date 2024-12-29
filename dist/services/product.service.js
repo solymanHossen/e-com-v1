@@ -20,7 +20,22 @@ class ProductService {
     }
     static getProducts() {
         return __awaiter(this, arguments, void 0, function* (query = {}) {
-            return product_model_1.Product.find(query);
+            const page = parseInt(query.page) || 1;
+            const limit = parseInt(query.limit) || 10;
+            const search = query.search || '';
+            const filterQuery = search ? { name: { $regex: search, $options: 'i' } } : {};
+            const skip = (page - 1) * limit;
+            const [products, total] = yield Promise.all([
+                product_model_1.Product.find(filterQuery).skip(skip).limit(limit),
+                product_model_1.Product.countDocuments(filterQuery)
+            ]);
+            const pagination = {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            };
+            return { products, pagination };
         });
     }
     static getProductById(id) {

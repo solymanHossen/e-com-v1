@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductsByCategory = exports.deleteProduct = exports.updateProduct = exports.getProduct = exports.getProducts = exports.createProduct = void 0;
 const product_service_1 = require("../services/product.service");
+const logger_1 = __importDefault(require("../utils/logger"));
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const product = yield product_service_1.ProductService.createProduct(req.body);
@@ -23,10 +27,11 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.createProduct = createProduct;
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const products = yield product_service_1.ProductService.getProducts();
+        const products = yield product_service_1.ProductService.getProducts(req.query);
         res.json(products);
     }
     catch (error) {
+        logger_1.default.error(error);
         res.status(500).json({ message: 'Error fetching products', error });
     }
 });
@@ -35,11 +40,13 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const product = yield product_service_1.ProductService.getProductById(req.params.id);
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            res.status(404).json({ message: 'Product not found' });
+            return;
         }
         res.json(product);
     }
     catch (error) {
+        logger_1.default.error(error);
         res.status(500).json({ message: 'Error fetching product', error });
     }
 });
@@ -48,11 +55,13 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const updatedProduct = yield product_service_1.ProductService.updateProduct(req.params.id, req.body);
         if (!updatedProduct) {
-            return res.status(404).json({ message: 'Product not found' });
+            res.status(404).json({ message: 'Product not found' });
+            return;
         }
         res.json(updatedProduct);
     }
     catch (error) {
+        logger_1.default.error(error);
         res.status(500).json({ message: 'Error updating product', error });
     }
 });
@@ -61,11 +70,13 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const deletedProduct = yield product_service_1.ProductService.deleteProduct(req.params.id);
         if (!deletedProduct) {
-            return res.status(404).json({ message: 'Product not found' });
+            res.status(404).json({ message: 'Product not found' });
+            return;
         }
         res.json({ message: 'Product deleted successfully' });
     }
     catch (error) {
+        logger_1.default.error(error);
         res.status(500).json({ message: 'Error deleting product', error });
     }
 });

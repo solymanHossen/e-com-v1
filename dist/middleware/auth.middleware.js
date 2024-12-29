@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_model_1 = require("../models/user.model");
+const logger_1 = __importDefault(require("../utils/logger"));
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -23,7 +24,8 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             throw new Error();
         }
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        const user = yield user_model_1.User.findOne({ _id: decoded._id });
+        const user = yield user_model_1.User.findOne({ _id: decoded.id });
+        logger_1.default.info(user);
         if (!user) {
             throw new Error();
         }
