@@ -19,6 +19,8 @@ export interface IUser extends Document {
     };
     isVerified: boolean;
     verificationToken?: string;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
     _id:Schema.Types.ObjectId | string ;
     obId:Schema.Types.ObjectId | string;
     phoneNumber?: string;
@@ -43,6 +45,8 @@ const userSchema = new Schema<IUser>({
     },
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     phoneNumber: { type: String },
     cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
     wishlist: { type: Schema.Types.ObjectId, ref: 'Wishlist' },
