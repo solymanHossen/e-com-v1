@@ -10,7 +10,11 @@ export class ProductService {
         const page = parseInt(query.page) || 1;
         const limit = parseInt(query.limit) || 10;
         const search = query.search || '';
-        const filterQuery = search ? { name: { $regex: search, $options: 'i' } } : {};
+        const category = query.category || '';
+        const filterQuery = {
+            ...(search && { name: { $regex: search, $options: 'i' } }),
+            ...(category && { category }),
+        };
         const skip = (page - 1) * limit;
         const [products, total] = await Promise.all([
             Product.find(filterQuery).skip(skip).limit(limit),
