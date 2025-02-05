@@ -75,5 +75,49 @@ class AuthService {
             return { user, token };
         });
     }
+    static forgotPassword(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_model_1.User.findOne({ email });
+            if (!user) {
+                throw new Error('User not found');
+            }
+            const resetToken = crypto_1.default.randomBytes(32).toString('hex');
+            user.resetPasswordToken = resetToken;
+            user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
+            yield user.save();
+            const transporter = nodemailer_1.default.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Password Reset',
+                text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        ${process.env.BASE_URL}/reset-password/${resetToken}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+            };
+            yield transporter.sendMail(mailOptions);
+        });
+    }
+    static resetPassword(token, newPassword) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_model_1.User.findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: { $gt: Date.now() },
+            });
+            if (!user) {
+                throw new Error('Password reset token is invalid or has expired');
+            }
+            user.password = newPassword;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            yield user.save();
+        });
+    }
 }
 exports.AuthService = AuthService;

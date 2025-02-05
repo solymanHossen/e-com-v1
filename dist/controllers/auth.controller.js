@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.verifyEmail = exports.register = void 0;
+exports.resetPassword = exports.forgotPassword = exports.login = exports.verifyEmail = exports.register = void 0;
 const auth_service_1 = require("../services/auth.service");
 const logger_1 = __importDefault(require("../utils/logger"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,3 +55,27 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.login = login;
+const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        yield auth_service_1.AuthService.forgotPassword(email);
+        res.status(200).json({ message: 'Password reset email sent' });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+exports.forgotPassword = forgotPassword;
+const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { token } = req.params;
+        console.log(token);
+        const { password } = req.body;
+        yield auth_service_1.AuthService.resetPassword(token, password);
+        res.status(200).json({ message: 'Password has been reset' });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+exports.resetPassword = resetPassword;

@@ -64,6 +64,8 @@ const userSchema = new mongoose_1.Schema({
     },
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     phoneNumber: { type: String },
     cart: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Cart' },
     wishlist: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Wishlist' },

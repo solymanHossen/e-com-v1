@@ -23,7 +23,8 @@ class ProductService {
             const page = parseInt(query.page) || 1;
             const limit = parseInt(query.limit) || 10;
             const search = query.search || '';
-            const filterQuery = search ? { name: { $regex: search, $options: 'i' } } : {};
+            const category = query.category || '';
+            const filterQuery = Object.assign(Object.assign({}, (search && { name: { $regex: search, $options: 'i' } })), (category && { category }));
             const skip = (page - 1) * limit;
             const [products, total] = yield Promise.all([
                 product_model_1.Product.find(filterQuery).skip(skip).limit(limit),
