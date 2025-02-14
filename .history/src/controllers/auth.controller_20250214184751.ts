@@ -7,10 +7,13 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     await AuthService.register(name, email, password);
+    res
+      .status(201)
+      .json({ message: "User registered, verification email sent" });
     sendResponse(res, 201, true, "User registered, verification email sent");
   } catch (error: any) {
     logger.error(error);
-    sendResponse(res, 400, false, error.message);
+    res.status(400).json({ message: error.message });
   }
 };
 

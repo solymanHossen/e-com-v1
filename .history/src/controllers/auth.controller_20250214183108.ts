@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import logger from "../utils/logger";
-import sendResponse from "../utils/response";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     await AuthService.register(name, email, password);
-    sendResponse(res, 201, true, "User registered, verification email sent");
+    res
+      .status(201)
+      .json({ message: "User registered, verification email sent" });
   } catch (error: any) {
     logger.error(error);
-    sendResponse(res, 400, false, error.message);
+    res.status(400).json({ message: error.message });
   }
 };
 

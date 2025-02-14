@@ -7,7 +7,7 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     await AuthService.register(name, email, password);
-    sendResponse(res, 201, true, "User registered, verification email sent");
+    return sendResponse(res, 201, true, "User registered successfully");
   } catch (error: any) {
     logger.error(error);
     sendResponse(res, 400, false, error.message);
