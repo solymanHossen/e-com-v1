@@ -12,7 +12,6 @@ export const register = async (req: Request, res: Response) => {
     logger.error(error);
     sendResponse(res, 400, false, error.message);
   }
-
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {

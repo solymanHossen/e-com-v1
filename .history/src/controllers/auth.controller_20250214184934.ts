@@ -10,9 +10,9 @@ export const register = async (req: Request, res: Response) => {
     sendResponse(res, 201, true, "User registered, verification email sent");
   } catch (error: any) {
     logger.error(error);
+    res.status(400).json({ message: error.message });
     sendResponse(res, 400, false, error.message);
   }
-
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
