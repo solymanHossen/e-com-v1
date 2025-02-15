@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { AuthService } from "../services/auth.service";
+import { Request, Response } from 'express';
+import { AuthService } from '../services/auth.service';
 import logger from "../utils/logger";
 import sendResponse from "../utils/response";
 
@@ -26,37 +26,37 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const { user, token } = await AuthService.login(email, password);
-    res.status(200).json({
-      message: "Login successful",
-      userId: user._id,
-      token,
-    });
-  } catch (error: any) {
-    logger.error(error);
-    res.status(400).json({ message: error.message });
-  }
+    try {
+        const { email, password } = req.body;
+        const { user, token } = await AuthService.login(email, password);
+        res.status(200).json({
+            message: 'Login successful',
+            userId: user._id,
+            token,
+        });
+    } catch (error:any) {
+        logger.error(error);
+        res.status(400).json({ message: error.message });
+    }
 };
 export const forgotPassword = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    await AuthService.forgotPassword(email);
-    res.status(200).json({ message: "Password reset email sent" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
+    try {
+        const { email } = req.body;
+        await AuthService.forgotPassword(email);
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error:any) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const { token } = req.params;
-    console.log(token);
-    const { password } = req.body;
-    await AuthService.resetPassword(token, password);
-    res.status(200).json({ message: "Password has been reset" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
+    try {
+        const { token } = req.params;
+        console.log(token);
+        const { password } = req.body;
+        await AuthService.resetPassword(token, password);
+        res.status(200).json({ message: 'Password has been reset' });
+    } catch (error:any) {
+        res.status(400).json({ message: error.message });
+    }
 };
