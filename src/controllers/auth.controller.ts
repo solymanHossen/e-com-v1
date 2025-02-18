@@ -19,10 +19,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
         await AuthService.verifyEmail(token);
-        res.status(200).json({ message: 'Email verified successfully' });
+        sendResponse(res, 200, true, "Email verified successfully");
     } catch (error:any) {
         logger.error(error);
-        res.status(400).json({ message: error.message });
+        sendResponse(res, 400, false, error.message);
     }
 };
 
@@ -35,6 +35,7 @@ export const login = async (req: Request, res: Response) => {
             userId: user._id,
             token,
         });
+        sendResponse(res, 200, true, "Login successful", {token , user});
     } catch (error:any) {
         logger.error(error);
         res.status(400).json({ message: error.message });
