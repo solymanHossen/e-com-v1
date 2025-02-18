@@ -30,7 +30,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
         const { user, token } = await AuthService.login(email, password);
-        sendResponse(res, 200, true, "Login successful", {token , user});
+        sendResponse(res, 200, true, "Login successful", {token ,   user: {
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                isVerified: user.isVerified,
+            },});
     } catch (error:any) {
         logger.error(error);
         res.status(400).json({ message: error.message });
