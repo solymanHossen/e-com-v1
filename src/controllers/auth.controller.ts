@@ -30,11 +30,6 @@ export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
         const { user, token } = await AuthService.login(email, password);
-        res.status(200).json({
-            message: 'Login successful',
-            userId: user._id,
-            token,
-        });
         sendResponse(res, 200, true, "Login successful", {token , user});
     } catch (error:any) {
         logger.error(error);
