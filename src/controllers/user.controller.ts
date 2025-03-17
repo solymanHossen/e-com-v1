@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import logger from "../utils/logger";
+import sendResponse from "../utils/response";
 
 export const getUserProfile = async (req: AuthRequest, res: Response):Promise<void> => {
     try {
@@ -9,7 +10,7 @@ export const getUserProfile = async (req: AuthRequest, res: Response):Promise<vo
         if (!user) {
              res.status(404).json({ message: 'User not found' }); return ;
         }
-        res.json(user);
+        sendResponse(res, 200, true, "User profile fetched successfully", { user });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user profile', error });
     }
