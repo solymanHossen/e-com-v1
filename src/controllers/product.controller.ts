@@ -6,9 +6,9 @@ import sendResponse from "../utils/response";
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const product = await ProductService.createProduct(req.body);
-    res.status(201).json(product);
+    sendResponse(res,201, true, "Product created successfully", product);
   } catch (error) {
-    res.status(500).json({ message: "Error creating product", error });
+    sendResponse(res , 500, false, "Error creating product", error);
   }
 };
 
@@ -29,13 +29,13 @@ export const getProduct = async (
   try {
     const product = await ProductService.getProductById(req.params.id);
     if (!product) {
-      res.status(404).json({ message: "Product not found" });
+      sendResponse(res, 404, false, "Product not found");
       return;
     }
-    res.json(product);
+    sendResponse(res, 200, true, "Products fetched successfully", product);
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Error fetching product", error });
+    sendResponse(res, 500, false, "Error fetching product", error);
   }
 };
 
@@ -49,13 +49,13 @@ export const updateProduct = async (
       req.body
     );
     if (!updatedProduct) {
-      res.status(404).json({ message: "Product not found" });
+      sendResponse(res, 404, false, "Product not found");
       return;
     }
-    res.json(updatedProduct);
+    sendResponse(res, 200, true, "Product updated successfully", updatedProduct);
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Error updating product", error });
+    sendResponse(res, 500, false, "Error updating product", error);
   }
 };
 
@@ -66,13 +66,13 @@ export const deleteProduct = async (
   try {
     const deletedProduct = await ProductService.deleteProduct(req.params.id);
     if (!deletedProduct) {
-      res.status(404).json({ message: "Product not found" });
+      sendResponse(res, 404, false, "Product not found");
       return;
     }
-    res.json({ message: "Product deleted successfully" });
+    sendResponse(res, 200, true, "Product deleted successfully", deletedProduct);
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ message: "Error deleting product", error });
+    sendResponse(res, 500, false, "Error deleting product", error);
   }
 };
 
@@ -84,10 +84,11 @@ export const getProductsByCategory = async (
     const products = await ProductService.getProductsByCategory(
       req.params.category
     );
-    res.json(products);
+    sendResponse(res, 200, true, "Products fetched successfully", products);
   } catch (error) {
     res
       .status(500)
       .json({ message: "Error fetching products by category", error });
+    sendResponse(res, 500, false, "Error deleting product", error);
   }
 };
