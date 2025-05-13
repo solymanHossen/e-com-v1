@@ -86,9 +86,6 @@ export const getProductsByCategory = async (
     );
     sendResponse(res, 200, true, "Products fetched successfully", products);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching products by category", error });
     sendResponse(res, 500, false, "Error deleting product", error);
   }
 };
