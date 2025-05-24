@@ -11,8 +11,9 @@ export interface UploadedFile {
 }
 
 export interface CloudinaryUploadResult {
-    url: string
-    publicId: string
+    _id?: any;
+    url: string | undefined;
+    publicId: string | undefined;
 }
 
 export interface UploadOptions {
@@ -28,11 +29,16 @@ export interface UploadField {
 }
 
 // Extended Express Request with file(s)
+// export interface RequestWithFile extends Request {
+//     file?: UploadedFile
+//     files?:
+//         | {
+//         [fieldname: string]: UploadedFile[]
+//     }
+//         | UploadedFile[]
+// }
+
 export interface RequestWithFile extends Request {
     file?: UploadedFile
-    files?:
-        | {
-        [fieldname: string]: UploadedFile[]
-    }
-        | UploadedFile[]
+    files?: UploadedFile[] | { [fieldname: string]: UploadedFile[] }
 }

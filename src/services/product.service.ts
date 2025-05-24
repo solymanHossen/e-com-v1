@@ -1,4 +1,5 @@
-import { Product, IProduct } from '../models/product.model';
+import {Product, IProduct, IGalleryImage} from '../models/product.model';
+import {CloudinaryUploadResult} from "../types/upload.types";
 
 export class ProductService {
     static async createProduct(productData: Partial<IProduct>): Promise<IProduct> {
@@ -44,5 +45,27 @@ export class ProductService {
 
     static async getProductsByCategory(category: string): Promise<IProduct[]> {
         return Product.find({ category: category });
+    }
+    static async addProductGalleryImages(id: string, galleryImages: CloudinaryUploadResult[]): Promise<IProduct | null> {
+        const product = await Product.findById(id)
+        if (!product) return null
+
+        // Convert CloudinaryUploadResult to gallery format
+        const newGalleryImages: Partial<IGalleryImage>[] = galleryImages.map((img) => ({
+            url: img.url,
+            publicId: img.publicId,
+        }));
+        // Add new images to gallery (create gallery array if it doesn't exist)
+        if (!product.gallery) {
+            product.gallery = newGalleryImages
+        } else {
+            product.gallery.push(...newGalleryImages)
+        }
+
+        return product.save()
+    }
+
+    static async removeProductGalleryImage(id: string, imageId: string): Promise<IProduct | null> {
+        return Product.findByIdAndUpdate(id, { $pull: { gallery: { _id: imageId } } }, { new: true })
     }
 }

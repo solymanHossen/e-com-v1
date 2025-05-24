@@ -7,13 +7,13 @@ import {uploadFactory} from "../middleware/upload.middleware";
 // Example of how to use the upload system in a product controller
 
 // Middleware setup for product images
-const productImageUpload = uploadFactory.single("image", {
+export const productImageUpload = uploadFactory.single("image", {
     folder: "products",
     formats: ["jpg", "jpeg", "png", "webp"],
     maxSize: 5 * 1024 * 1024,
 })
 
-const productGalleryUpload = uploadFactory.array("gallery", 5, {
+export const productGalleryUpload = uploadFactory.array("gallery", 5, {
     folder: "products/gallery",
     formats: ["jpg", "jpeg", "png", "webp"],
     maxSize: 5 * 1024 * 1024,

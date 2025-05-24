@@ -10,6 +10,7 @@ export const handleUploadError = (err: any, req: Request, res: Response, next: N
     if (!err) {
         return next()
     }
+    console.log("Upload error:", err)
 
     if (err.code === "LIMIT_FILE_SIZE") {
         res.status(400).json({

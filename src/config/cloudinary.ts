@@ -3,7 +3,8 @@ import { CloudinaryStorage } from "multer-storage-cloudinary"
 import multer, { type FileFilterCallback, type Options } from "multer"
 import type { Request, Express } from "express"
 import type { UploadOptions } from "../types/upload.types"
-
+import dotenv from "dotenv";
+dotenv.config();
 // Configure Cloudinary
 const cloudinaryConfig: ConfigOptions = {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "",
