@@ -1,5 +1,5 @@
 import type { Request } from "express"
-
+import type { Multer } from "multer"
 export interface UploadedFile {
     fieldname: string
     originalname: string
@@ -38,7 +38,11 @@ export interface UploadField {
 //         | UploadedFile[]
 // }
 
+// export interface RequestWithFile extends Request {
+//     file?: UploadedFile
+//     files?: UploadedFile[] | { [fieldname: string]: UploadedFile[] }
+// }
 export interface RequestWithFile extends Request {
-    file?: UploadedFile
-    files?: UploadedFile[] | { [fieldname: string]: UploadedFile[] }
+    file?: Express.Multer.File
+    files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] }
 }
