@@ -30,7 +30,11 @@ export class ProductService {
 
         return { products, pagination };
     }
-
+    static async getProductBySlug(slug: string): Promise<IProduct | null> {
+        return Product.findOne({ slug })
+            .populate('reviews')
+            .lean();
+    }
     static async getProductById(id: string): Promise<IProduct | null> {
         return Product.findById(id);
     }

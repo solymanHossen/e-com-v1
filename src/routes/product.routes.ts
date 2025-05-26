@@ -1,18 +1,4 @@
-// import express from 'express';
-// import { authMiddleware } from '../middleware/auth.middleware';
-// import { createProduct, getProducts, getProduct, updateProduct, deleteProduct, getProductsByCategory } from '../controllers/product.controller';
-// import { validateCreateProduct, validateUpdateProduct } from '../validators/product.validator';
-//
-// const router = express.Router();
-//
-// router.post('/', authMiddleware, validateCreateProduct, createProduct);
-// router.get('/', getProducts);
-// router.get('/:id', getProduct);
-// router.put('/:id', authMiddleware, validateUpdateProduct, updateProduct);
-// router.delete('/:id', authMiddleware, deleteProduct);
-// router.get('/category/:category', getProductsByCategory);
-//
-// export default router;
+
 import express from "express"
 import { authMiddleware } from "../middleware/auth.middleware"
 import {
@@ -23,7 +9,7 @@ import {
     deleteProduct,
     getProductsByCategory,
     addProductGalleryImages,
-    removeProductGalleryImage,
+    removeProductGalleryImage, getProductBySlug,
 } from "../controllers/product.controller"
 import { validateCreateProduct, validateUpdateProduct } from "../validators/product.validator"
 import {handleUploadError, uploadFactory} from "../middleware/upload.middleware";
@@ -56,6 +42,8 @@ router.post(
     createProduct,
 )
 
+
+
 // Update product with optional image upload
 router.put(
     "/:id",
@@ -80,6 +68,8 @@ router.delete("/:id/gallery/:imageId", authMiddleware, removeProductGalleryImage
 
 // Standard routes without file upload
 router.get("/", getProducts)
+// create slug for product
+router.get("/slug/:slug", getProductBySlug)
 router.get("/:id", getProduct)
 router.delete("/:id", authMiddleware, deleteProduct)
 router.get("/category/:category", getProductsByCategory)

@@ -56,11 +56,23 @@ export const getProduct = async (req: Request, res: Response): Promise<void> => 
     sendResponse(res, 500, false, "Error fetching product", error)
   }
 }
-
+export const getProductBySlug = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const product = await ProductService.getProductBySlug(req.params.slug)
+    if (!product) {
+      sendResponse(res, 404, false, "Product not found")
+      return
+    }
+    sendResponse(res, 200, true, "Product fetched successfully", product)
+  } catch (error) {
+    logger.error(error)
+    sendResponse(res, 500, false, "Error fetching product", error)
+  }
+}
 export const updateProduct = async (req: RequestWithFile, res: Response): Promise<void> => {
   try {
-    // Get existing product to check for image replacement
-    const existingProduct = await ProductService.getProductById(req.params.id)
+
+    const existingProduct = await ProductService.getProductById(req.params.id);
     if (!existingProduct) {
       sendResponse(res, 404, false, "Product not found")
       return
@@ -97,7 +109,7 @@ export const updateProduct = async (req: RequestWithFile, res: Response): Promis
     logger.error(error)
     sendResponse(res, 500, false, "Error updating product", error)
   }
-}
+};
 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
