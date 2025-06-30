@@ -72,7 +72,7 @@ export class AuthService {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-      expiresIn: "1h",
+      expiresIn: "10minutes",
     });
 
     return { user, token };
