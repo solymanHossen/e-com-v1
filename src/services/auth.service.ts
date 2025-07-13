@@ -57,7 +57,7 @@ export class AuthService {
   static async login(
     email: string,
     password: string
-  ): Promise<{ user: IUser; token: string }> {
+  ): Promise<{ user: IUser; token: string; refreshToken: string }> {
     const user = await User.findOne({ email });
     if (!user) {
       throw new Error("User not found");
@@ -72,11 +72,37 @@ export class AuthService {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-      expiresIn: "10minutes",
+      expiresIn: "1m",
     });
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET!,
+      {
+        expiresIn: "7d",
+      }
+    );
+    user.refreshToken = refreshToken;
+    await user.save();
 
-    return { user, token };
+    return { user, token, refreshToken };
   }
+
+  static async refreshAccessToken(refreshToken: string): Promise<{ token: string }> {
+    const user = await User.findOne({ refreshToken });
+    if (!user) {
+      throw new Error("Invalid refresh token");
+    }
+    try {
+      jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
+    } catch (err) {
+      throw new Error("Refresh token expired or invalid");
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
+      expiresIn: "10m",
+    });
+    return { token };
+  }
+
   static async forgotPassword(email: string): Promise<void> {
     const user = await User.findOne({ email });
     if (!user) {

@@ -29,18 +29,34 @@ export const verifyEmail = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        const { user, token } = await AuthService.login(email, password);
-        sendResponse(res, 200, true, "Login successful", {token ,   user: {
+        const { user, token, refreshToken } = await AuthService.login(email, password);
+        sendResponse(res, 200, true, "Login successful", {
+            token,
+            refreshToken,
+            user: {
                 email: user.email,
                 name: user.name,
                 role: user.role,
                 isVerified: user.isVerified,
-            },});
+            },
+        });
     } catch (error:any) {
         logger.error(error);
         res.status(400).json({ message: error.message });
     }
 };
+
+export const refreshToken = async (req: Request, res: Response) => {
+    try {
+        const { refreshToken } = req.body;
+        const { token } = await AuthService.refreshAccessToken(refreshToken);
+        sendResponse(res, 200, true, "Token refreshed", { token });
+    } catch (error: any) {
+        logger.error(error);
+        sendResponse(res, 400, false, error.message);
+    }
+};
+
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;

@@ -27,6 +27,7 @@ export interface IUser extends Document {
     cart: ICart['_id'];
     wishlist: IWishlist['_id'];
     comparePassword(candidatePassword: string): Promise<boolean>;
+    refreshToken?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -50,6 +51,7 @@ const userSchema = new Schema<IUser>({
     phoneNumber: { type: String },
     cart: { type: Schema.Types.ObjectId, ref: 'Cart' },
     wishlist: { type: Schema.Types.ObjectId, ref: 'Wishlist' },
+    refreshToken: { type: String },
 }, { timestamps: true });
 
 userSchema.pre<IUser>('save', async function (next) {
