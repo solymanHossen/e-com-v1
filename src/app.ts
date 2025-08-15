@@ -18,6 +18,8 @@ import discountRoutes from "./routes/discount.routes";
 import cartRoutes from "./routes/cart.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import checkoutRoutes from "./routes/checkout.routes";
+import themeRoutes from "./routes/theme.routes";
+import { ThemeService } from "./services/theme.service";
 
 config(); // Load environment variables
 
@@ -30,8 +32,19 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-connectDatabase();
+// Connect to MongoDB and initialize theme database
+const initializeApp = async () => {
+  try {
+    await connectDatabase();
+    await ThemeService.initializeDatabase();
+    logger.info('Application initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize application:', error);
+    process.exit(1);
+  }
+};
+
+initializeApp();
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -44,6 +57,7 @@ app.use('/api/v1/discounts', discountRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/checkout', checkoutRoutes);
+app.use('/api/v1/themes', themeRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
