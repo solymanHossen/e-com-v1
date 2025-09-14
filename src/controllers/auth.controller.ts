@@ -7,7 +7,7 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     await AuthService.register(name, email, password);
-    sendResponse(res, 201, true, "User registered, verification email sent");
+    sendResponse(res, 201, true, "User registered successfully. Please check your email for OTP verification.");
   } catch (error: any) {
     logger.error(error);
     sendResponse(res, 400, false, error.message);
@@ -17,10 +17,21 @@ export const register = async (req: Request, res: Response) => {
 
 export const verifyEmail = async (req: Request, res: Response) => {
     try {
-        const { token } = req.params;
-        await AuthService.verifyEmail(token);
-        sendResponse(res, 200, true, "Email verified successfully");
+        const { otp, email } = req.body;
+        await AuthService.verifyOTP(email, otp);
+        sendResponse(res, 200, true, "Email verified successfully. You can now login.");
     } catch (error:any) {
+        logger.error(error);
+        sendResponse(res, 400, false, error.message);
+    }
+};
+
+export const resendVerificationOTP = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        await AuthService.resendOTP(email);
+        sendResponse(res, 200, true, "New OTP sent to your email successfully.");
+    } catch (error: any) {
         logger.error(error);
         sendResponse(res, 400, false, error.message);
     }

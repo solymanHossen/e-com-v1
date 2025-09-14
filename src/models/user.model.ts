@@ -18,7 +18,8 @@ export interface IUser extends Document {
         country: string;
     };
     isVerified: boolean;
-    verificationToken?: string;
+    verificationOTP?: string;
+    otpExpires?: Date;
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
     _id:Schema.Types.ObjectId | string ;
@@ -45,7 +46,8 @@ const userSchema = new Schema<IUser>({
         country: { type: String },
     },
     isVerified: { type: Boolean, default: false },
-    verificationToken: { type: String },
+    verificationOTP: { type: String },
+    otpExpires: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     phoneNumber: { type: String },
